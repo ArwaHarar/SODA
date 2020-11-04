@@ -1,0 +1,179 @@
+---
+title: "Literacy and Unemployemnt" 
+subtitle: "Soda 308"
+author: " Arwa Hararwala, Benjamin Giles, Zixuan Li, & Emir Erisen"
+output: html_notebook
+---
+
+### Data Analysis 
+- We will be evualuating how the GDP per capita affects the existing relationship between unemployment and divorce rate 
+
+Unemployment Data: https://data.worldbank.org/indicator/SE.ADT.LITR.ZS
+Divorce Rate Data: https://www.kaggle.com/unsdsn/world-happiness#2017.csv
+GDP per capita: 
+
+
+### Question to Evaluate
+What is the relationship between having a higher literacy rate and the World Happiness Index score that a country or region recieves? 
+
+
+Installing the libraries that are needed to be able to load and preform queries on the dataset.
+```{r}
+library(DataComputing)
+library(tidyverse)
+library(rvest)
+library(lubridate)
+library(dplyr)
+library(readr)
+library(ggplot2)
+```
+
+
+
+### Load Data
+Getting the tables into RStudio to be able to use them for evaluation. We will do this using the reading functions that we learned for the textbook. 
+```{r}
+file_name <- file.choose()
+Literacy_Data <- data.table::fread(file_name)
+Literacy_Data
+```
+
+
+```{r}
+happinessTable <- read_csv("2018[1].csv")
+happinessTable
+```
+
+### Inspect Loaded Datatables
+```{r}
+glimpse(happinessTable)
+head(happinessTable)
+```
+```{r}
+glimpse(Literacy_Data)
+head(Literacy_Data)
+```
+
+### Data Wrangling of Happiness Table 
+```{r}
+Happiness <-
+  happinessTable %>%
+  rename(rank = `Overall rank`) %>%
+  rename(Country = `Country or region`) %>%
+  rename(gdp = `GDP per capita`) %>%
+  rename(support = `Social support`) %>%
+  rename(lifeExpectancy = `Healthy life expectancy`) %>%
+  rename(freedom = `Freedom to make life choices`) %>%
+  rename(corruption = `Perceptions of corruption`)
+Happiness
+```
+
+### Data Wrangling of Literacy Data 
+```{r}
+#This makes the variable names into the first row name
+colnames(Literacy_Data)<- as.character(unlist(Literacy_Data[1,]))
+Literacy_Data
+```
+
+```{r}
+Cleaned_Literacy <- 
+  Literacy_Data[-c(1),]%>%
+  select(c(1,63))%>%
+  rename(Country = `Country Name`) %>%
+  rename(Y2018 = `2018`)%>%
+  filter(!is.na(Y2018))
+Cleaned_Literacy
+  
+```
+
+### Another View of the Data Post-Wrangling
+
+```{r}
+Cleaned_Literacy %>%
+  spread(key = Country, value = Y2018)
+```
+ This is another way to look at this data. We did not find it as beneficial as the other inspection methods, but allows a simple alternative view that allows for schrolling and an easier way to look at each country indivudally. 
+ 
+### Plots and Views of Original Datasets 
+
+Happiness Map
+```{r}
+Happiness %>%
+  WorldMap(key = "Country", fill = "Score")
+```
+
+Literacy World Map
+```{r}
+Cleaned_Literacy %>%
+  WorldMap(key = "Country", fill = "Y2018")
+```
+
+### Summary Statisitcs for Data Sets
+```{r}
+SSHappiness <-
+  Happiness %>%
+  summarise(aveScore = mean(Score, na.rm = TRUE),
+            minScore = min(Score, na.rm =TRUE),
+            maxScore = max(Score, na.rm = TRUE))
+SSHappiness
+```
+
+```{r}
+SSLiteracy <-
+  Cleaned_Literacy %>%
+  summarise(aveLiteracy = mean(Y2018, na.rm=TRUE),
+            minLiteracy = min(Y2018, na.rm = TRUE),
+            maxLiteracy = max(Y2018, na.rm = TRUE))
+SSLiteracy
+```
+
+### Find Countries Starting with "A" to get subset of data (Reg Expressions)
+
+Happiness Data: 
+```{r}
+SubsetHappiness <-
+  Happiness %>%
+  filter(grepl("^A", Country, ignore.case = TRUE)) 
+SubsetHappiness
+```
+We can see that there is no relationship between the starting letter of a country to the Happiness Score and therefore this is not a good way to evaluate the country information. 
+
+
+Literacy Data:
+```{r}
+SubsetLiteracy <-
+  Cleaned_Literacy %>%
+  filter(grepl("^A", Country, ignore.case = TRUE))
+SubsetLiteracy
+  
+```
+From this data we can also see that there is no relationship between the country starting with letter "A" and their corresponding litercy rates. From this observation, we have decided that we will not be using regular expressions to filter a subset of countries, but rather looks at the trends for the all country data recorded. 
+
+
+### Preliminary Observations
+
+For the happiness data we can see that as the score gets closer to the smaller numbers, the GDP is decreasing for that country. We can also see in an intitial analysis, that US, Canada, and Australia seem to have the highest Happiness Score based on the color key of the world graph. 
+
+For the literacy data, we can see that there are certain countries that have a much higher literacy percentage rate that onther countries , which have a much lower rate. We can then join both countries by "Country" and see how GDP relates to the literacy rates of each country and evaluate their correlation. 
+
+
+### Join of Tables for Analysis 
+By using an inner join we are able to merge the Happiness and Cleaned_Literacy tables by the shared varaible(column) of "Country," and remove all of the countries where there are no matches for "Country," so that we only have countries with values rather than NULL in our final analysis. 
+```{r}
+Happiness_Literacy <-
+  Happiness %>%
+  inner_join(Cleaned_Literacy)
+Happiness_Literacy
+
+```
+
+### Plot of the Relationship between Happiness and Literacy 
+```{r}
+Happiness_Literacy %>%
+  ggplot(aes(x = Score, y = Y2018 ))+
+  geom_point(aes(color = rank))+
+  stat_smooth(method = lm)+
+  labs(x = "Happiness Score", y = "Literacy Rate", title = "Does Happiness Correspond to Literacy?")
+```
+
+
