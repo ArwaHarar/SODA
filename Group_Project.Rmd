@@ -8,8 +8,8 @@ output: html_notebook
 ### Data Analysis 
 - We will be evualuating how the GDP per capita affects the existing relationship between unemployment and divorce rate 
 
-Unemployment Data: https://data.worldbank.org/indicator/SE.ADT.LITR.ZS
-Divorce Rate Data: https://www.kaggle.com/unsdsn/world-happiness#2017.csv
+Unemployment Data: 
+Divorce Rate Data: 
 GDP per capita: 
 
 
