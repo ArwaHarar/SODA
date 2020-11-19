@@ -6,16 +6,14 @@ output: html_notebook
 ---
 
 ### Data Analysis 
-- We will be evualuating how the GDP per capita affects the existing relationship between unemployment and divorce rate 
-
-Unemployment Data: 
-Divorce Rate Data: 
-GDP per capita: 
+We will be looking at four variables in this study, which include, divorce rate on countries in the European Union, unemployment for countries in the European Union, GDP per person for countries in the European Union, and a created data set of estimated real cost of divorce per country in the European Union.
 
 
 ### Question to Evaluate
-What is the relationship between having a higher literacy rate and the World Happiness Index score that a country or region recieves? 
+What is the relationship between a countries GDP per capita and the unemployment and divorce trend rates that are already found.
 
+## Hypothesis
+The hypothesis that we will be evaluating over the course of this research paper is that a lower GDP per capita in a country, leads to a less positive linear relationship between unemployment and divorce rate, due to the cost of divorce.
 
 Installing the libraries that are needed to be able to load and preform queries on the dataset.
 ```{r}
@@ -31,28 +29,18 @@ library(ggplot2)
 
 
 ### Load Data
-Getting the tables into RStudio to be able to use them for evaluation. We will do this using the reading functions that we learned for the textbook. 
+Getting the tables into RStudio to be able to use them for evaluation.
 ```{r}
-file_name <- file.choose()
-Literacy_Data <- data.table::fread(file_name)
-Literacy_Data
+Divorce <- read_csv("divorce_rate.csv")
+Divorce
 ```
 
 
 ```{r}
-happinessTable <- read_csv("2018[1].csv")
-happinessTable
+unemployment <- read_csv("unemployment.csv")
+unemployment
 ```
 
-### Inspect Loaded Datatables
-```{r}
-glimpse(happinessTable)
-head(happinessTable)
-```
-```{r}
-glimpse(Literacy_Data)
-head(Literacy_Data)
-```
 
 ### Data Wrangling of Happiness Table 
 ```{r}
