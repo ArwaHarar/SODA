@@ -24,6 +24,7 @@ library(lubridate)
 library(dplyr)
 library(readr)
 library(ggplot2)
+library(data.table)
 ```
 
 
@@ -42,21 +43,16 @@ unemployment
 ```
 
 
-### Data Wrangling of Happiness Table 
+### Data Wrangling of Divorce Table 
 ```{r}
-Happiness <-
-  happinessTable %>%
-  rename(rank = `Overall rank`) %>%
-  rename(Country = `Country or region`) %>%
-  rename(gdp = `GDP per capita`) %>%
-  rename(support = `Social support`) %>%
-  rename(lifeExpectancy = `Healthy life expectancy`) %>%
-  rename(freedom = `Freedom to make life choices`) %>%
-  rename(corruption = `Perceptions of corruption`)
-Happiness
+# remove first row
+
+
+
+
 ```
 
-### Data Wrangling of Literacy Data 
+### Data Wrangling of Unemployment Data 
 ```{r}
 #This makes the variable names into the first row name
 colnames(Literacy_Data)<- as.character(unlist(Literacy_Data[1,]))
