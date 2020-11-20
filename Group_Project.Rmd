@@ -31,13 +31,13 @@ library(ggplot2)
 ### Load Data
 Getting the tables into RStudio to be able to use them for evaluation.
 ```{r}
-Divorce <- read_csv("divorce_rate.csv")
+Divorce <- read_csv("divorce_new.csv")
 Divorce
 ```
 
 
 ```{r}
-unemployment <- read_csv("unemployment.csv")
+unemployment <- read_csv("unemployment_new.csv")
 unemployment
 ```
 
