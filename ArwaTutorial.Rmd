@@ -1,19 +1,126 @@
 ---
-title: "R Notebook"
+title: "Literacy and Unemployemnt GGPLOT Tutorial" 
+subtitle: "Soda 308"
+author: " Arwa Hararwala"
 output: html_notebook
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+### Definition/tools: 
+To determine how unemployment and divorce rates correlate with GDP per capita of specific European countries, we will be using R markdown and several other R libraries, such as ggplot, to be able to calculate and visualize the relationship between these variables to generate results for our research.
 
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+Once we load and wrangle the data into the optimal form for analysis, we will be creating graphs in order to see the correlation between the unemployment and divorce rate trends and the GDP per capita of certain European countries in order to see if there is a relationship or not.  
 
+The R library, ggplot, will give us the functionality of developing several different types of graphs, such as, scatter plots, bar graphs, histograms, and more. The visualization capabilities that this library is able to give us will be useful for our research as well any other research studies that would benefit from data visualization techniques. This tutorial will allow for the tools used in this study to help other individuals who would like to explore their data in graphical form and use coding techniques to increase the functionality and visibility of their collected data points. 
+
+
+### Importance of Ggplot
+The reason I chose to use ggplot for the research tutorial was because this tool is a significant part of our project. This library gives us the functionality to take our data points and be able to visualize the relationships in order to see the strength or weakness between them. Without this tool, it would be very hard to explain, calculate, & visualize the data points and see the relationship. 
+
+Additionally, it is important because it allows for a quicker and more thorough understanding of our dataset. For example, if one is interested in reading our paper, but does not have a good understanding of how numbers correlate, then they will have an extremely hard time understanding our findings and therefore will be skeptical of our results. The ggplot library allows for the visualizations of these complex mathematical trends in a simple, legible, and user-friendly way. If the data you wish to study is larger in number and has several numerical features that may be harder to represent with formulas and text, ggplot will be a great tool for a  more user-frienly approach.
+
+
+### Data Analysis Example
+The following example is a research topic that is able to benefit from graphing and plotting the data that was gathered in order to see if there was an existent relationship between the variables. 
+	
+The research question that we will be evaluating is: what is the relationship between having a higher literacy rate and the world happiness index score that a country or region receives? The data was gathered from these sources if interested in replicating this example:
+ 
+ Literacy Data: https://data.worldbank.org/indicator/SE.ADT.LITR.ZS
+World Happiness Index Data: https://www.kaggle.com/unsdsn/world-happiness#2017.csv
+ 
+The data that we have taken is from two .csv files that will need to first be wrangled into usable data tables once the files have been read into the RMD file. Once that step has been completed, we will be inspecting these “new” datasets and making sure that they align in order for proper evaluation and joining abilities. The final plot was generated for the comparison between literacy rates and happiness score was the ggplot example that helped us with the final visualizations of the dataset. As we can see by the graph, we have used many of the graphical features provided in ggplot, which include, stat_smooth, which makes the linear line based on the scatter points generated, aes(), which allows you to set the data to use for the X and Y axes. geom_point() sets the color and type of points generated on the graph, and finally the labs() allows specification of the labels on the axes and title of the graph.
+
+All of these functionalities are important for our research. If you are using a similar dataset for your study, this library will allow you to have the ability to label, color code, and visualize your dataset, which can help you see different aspects of the data for a more deeper and well-rounded understanding. It will allow for you to see the relationship between each individual data point, which is very important in being able to draw conclusions. 
+ 
+
+This is a very prominent library for our research because the numbers itself are not able to show us the impact of the variables on one another in a clear way. Having the linear line of best fit shows us if there is a significant relationship between the data point trends. 
+
+### Question to Evaluate
+What is the relationship between having a higher literacy rate and the World Happiness Index score that a country or region recieves? 
+
+### Data Wrangling Steps 
+
+Installing the libraries that are needed to be able to load and preform queries on the dataset.
 ```{r}
-plot(cars)
+library(DataComputing)
+library(tidyverse)
+library(rvest)
+library(lubridate)
+library(dplyr)
+library(readr)
+library(ggplot2)
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+## Load Data
+Getting the tables into RStudio to be able to use them for evaluation. We will do this using the reading functions that we learned for the textbook. 
+```{r}
+file_name <- file.choose()
+Literacy_Data <- data.table::fread(file_name)
+```
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+```{r}
+happinessTable <- read_csv("2018[1].csv")
+```
+
+
+## Data Wrangling of Happiness Table 
+```{r}
+Happiness <-
+  happinessTable %>%
+  rename(rank = `Overall rank`) %>%
+  rename(Country = `Country or region`) %>%
+  rename(gdp = `GDP per capita`) %>%
+  rename(support = `Social support`) %>%
+  rename(lifeExpectancy = `Healthy life expectancy`) %>%
+  rename(freedom = `Freedom to make life choices`) %>%
+  rename(corruption = `Perceptions of corruption`)
+
+```
+
+## Data Wrangling of Literacy Data 
+```{r}
+#This makes the variable names into the first row name
+colnames(Literacy_Data)<- as.character(unlist(Literacy_Data[1,]))
+
+```
+
+```{r}
+Cleaned_Literacy <- 
+  Literacy_Data[-c(1),]%>%
+  select(c(1,63))%>%
+  rename(Country = `Country Name`) %>%
+  rename(Y2018 = `2018`)%>%
+  filter(!is.na(Y2018))
+Cleaned_Literacy
+  
+```
+
+
+## Join of Tables for Analysis 
+By using an inner join we are able to merge the Happiness and Cleaned_Literacy tables by the shared varaible(column) of "Country," and remove all of the countries where there are no matches for "Country," so that we only have countries with values rather than NULL in our final analysis. 
+```{r}
+Happiness_Literacy <-
+  Happiness %>%
+  inner_join(Cleaned_Literacy)
+Happiness_Literacy
+
+```
+
+### Plot of the Relationship between Happiness and Literacy 
+```{r}
+Happiness_Literacy %>%
+  ggplot(aes(x = Score, y = Y2018 ))+
+  geom_point(aes(color = gdp))+
+  stat_smooth(method = lm)+
+  labs(x = "Happiness Score", y = "Literacy Rate", title = "Does Happiness Correspond to Literacy?")
+```
+
+### Application of Ggplot 
+The Ggplot library is an extremely versatile tool that can help point to the individual data points as well as the overarching trends of the data. For example, in our research project, ggplot helps us develop a linear line of best fit on our data set in order to see the location of each point, as well as, establishing a slope to understand the overall correlation of the data points. Within this line of best fit, there is a shaded region surrounding the line that shows us the confidence interval of the data, which was used to be able to show that there was a statisitcally significant relationship. This functionality allows for us to properly understand and formulate discussions and conclusions on the dataset. Without this graphical tool, I would not have been able to understand the correlation that exists between happiness indices and literacy rates of countries because the data points alone are not intuitive to a trend analysis.
+
+The ggplot library allowed the input of several features such as axes labels, titles, color schemes, and scales, which was a great way for me to separate the data by the GDP of a country simply by adding a color separation feature to the graph. If your study is similar to this data set in that there are multiple variables that can influence the variables of study, this feature will allow you to account for them and see their impact on the data as well. Futhermore, depending on the type of data points you have collected, different types of graphs will be able to better suited to output the most optimal vizulizations. For example, this data is has two continuous variables for Happiness score and Literacy rate, which is why this linear model and line of best fix was best for our data. If the data is caegorical or ordinal, box plots and bar graphs may be more helpful. 
+
+The reason ggplot is so important is because data visualization is key in understanding trends of the dataset. Ggplot allows the researcher to highlight the important features of their findings and produce it in a way that is easily understood by most individuals. Having proper representation of the data allows for other researchers to properly replicate and compare your study with their own and use it for other purposes. 
+
 
